@@ -8,6 +8,22 @@ Single chart deploying Kyverno ValidatingPolicies for Pod Security Standards (Ba
 - **`best-practices/`** – Best-practices policy YAML files (15 policies)
 - **Helm chart** – Deploy with `helm install`; supports excluding policies and overriding fields per set. All policies are cluster-scoped (no namespace).
 
+## Published chart (Nirmata)
+
+Source: [github.com/nirmata/n4k-policies](https://github.com/nirmata/n4k-policies). Chart name: **`n4k-policies`**. ValidatingPolicies use **`policies.kyverno.io/v1beta1`** (required for Kyverno 1.16.x).
+
+**OCI (recommended):**
+
+```bash
+helm install n4k-policies oci://ghcr.io/nirmata/charts/n4k-policies --version 0.1.5 -n kyverno --create-namespace
+```
+
+**GitHub Release (`.tgz` asset):**
+
+```bash
+helm install n4k-policies https://github.com/nirmata/n4k-policies/releases/download/v0.1.5/n4k-policies-0.1.5.tgz -n kyverno --create-namespace
+```
+
 ## Installing from the Helm repository
 
 Once the chart is [published](#publishing-the-chart), anyone can install it from the public Helm repo:
