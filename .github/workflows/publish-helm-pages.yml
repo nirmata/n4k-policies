@@ -1,0 +1,84 @@
+# Publishes this chart to the gh-pages branch so users can:
+#   helm repo add n4k-policies https://nirmata.github.io/n4k-policies/
+# Enable GitHub Pages: repo Settings → Pages → Build and deployment → Source: branch "gh-pages" / root.
+
+name: Publish Helm chart to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Chart.yaml"
+      - "values.yaml"
+      - "templates/**"
+      - "pod-security/**"
+      - "best-practices/**"
+      - ".github/workflows/publish-helm-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-helm-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout chart source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: Package chart
+        id: pack
+        run: |
+          helm package . -d /tmp/pkg
+          echo "version=$(grep '^version:' Chart.yaml | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+          ls -la /tmp/pkg/
+
+      - name: Publish chart + index.yaml to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Must match: Settings → Pages → site URL for this repository
+          PAGES_URL: https://nirmata.github.io/n4k-policies/
+        run: |
+          set -euo pipefail
+          REPODIR="/tmp/helm-gh-pages"
+          REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          rm -rf "$REPODIR"
+          mkdir -p "$REPODIR"
+
+          if git ls-remote --heads "$REPO_URL" gh-pages | grep -q gh-pages; then
+            git clone --depth 1 --branch gh-pages "$REPO_URL" "$REPODIR"
+          else
+            git -C "$REPODIR" init -b gh-pages
+            git -C "$REPODIR" remote add origin "$REPO_URL"
+          fi
+
+          cp /tmp/pkg/*.tgz "$REPODIR/"
+          cd "$REPODIR"
+          if [ -f index.yaml ]; then
+            helm repo index . --url "${PAGES_URL}" --merge index.yaml
+          else
+            helm repo index . --url "${PAGES_URL}"
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to index or packages; skipping commit."
+            exit 0
+          fi
+          git commit -m "Publish n4k-policies chart v${{ steps.pack.outputs.version }} (${{ github.sha }})"
+          git push origin HEAD:gh-pages
