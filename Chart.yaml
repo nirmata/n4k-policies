@@ -1,0 +1,11 @@
+apiVersion: v2
+name: n4k-policies
+description: Helm chart to deploy Kyverno Pod Security Standards (Baseline + Restricted) validating policies
+type: application
+version: 0.1.4
+appVersion: "1.0"
+keywords:
+  - kyverno
+  - pod-security
+  - policy
+maintainers: []

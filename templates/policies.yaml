@@ -1,0 +1,37 @@
+{{- /*
+  Renders Kyverno ValidatingPolicies from pod-security/*.yaml and best-practices/*.yaml.
+  - Excludes any policy whose metadata.name is in the set's excluded list
+  - Merges overrides.<policyName> on top of each base policy (deep merge)
+  - All resources are cluster-scoped (no namespace).
+*/ -}}
+{{- $excluded := .Values.policies.excluded | default list }}
+{{- $overridesRoot := .Values.policies.overrides | default dict }}
+{{- range $path, $_ := .Files.Glob "pod-security/*.yaml" }}
+{{- $content := $.Files.Get $path }}
+{{- $policy := $content | fromYaml }}
+{{- $name := $policy.metadata.name }}
+{{- if not (has $name $excluded) }}
+{{- $overrides := index $overridesRoot $name | default dict }}
+{{- $merged := mergeOverwrite (deepCopy $policy) $overrides }}
+{{- if $merged.metadata }}{{- $_ := unset $merged.metadata "namespace" }}{{- end }}
+---
+{{ $merged | toYaml }}
+{{- end }}
+{{- end }}
+{{- $bp := .Values.bestPractices | default dict }}
+{{- if ne (index $bp "enabled") false }}
+{{- $bpExcluded := $bp.excluded | default list }}
+{{- $bpOverrides := $bp.overrides | default dict }}
+{{- range $path, $_ := .Files.Glob "best-practices/*.yaml" }}
+{{- $content := $.Files.Get $path }}
+{{- $policy := $content | fromYaml }}
+{{- $name := $policy.metadata.name }}
+{{- if not (has $name $bpExcluded) }}
+{{- $overrides := index $bpOverrides $name | default dict }}
+{{- $merged := mergeOverwrite (deepCopy $policy) $overrides }}
+{{- if $merged.metadata }}{{- $_ := unset $merged.metadata "namespace" }}{{- end }}
+---
+{{ $merged | toYaml }}
+{{- end }}
+{{- end }}
+{{- end }}
