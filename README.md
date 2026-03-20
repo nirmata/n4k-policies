@@ -1,105 +1,141 @@
-# PSS Baseline + Restricted + Best Practices Kyverno Policies
+# n4k-policies — Kyverno ValidatingPolicy sets
 
-Single chart deploying Kyverno ValidatingPolicies for Pod Security Standards (Baseline + Restricted) and Best Practices, with optional customization (exclude/override) for each set.
+Helm chart that can deploy **one or more optional policy sets**. Each set is **opt-in** (`enabled: true`). Use it for Pod Security Standards, best practices, cleanup policies, platform-engineering rules, or custom YAML you add under the matching directories.
 
-## Contents
+## Policy sets (directories)
 
-- **`pod-security/`** – PSS policy YAML files (10 baseline + 6 restricted)
-- **`best-practices/`** – Best-practices policy YAML files (15 policies)
-- **Helm chart** – Deploy with `helm install`; supports excluding policies and overriding fields per set. All policies are cluster-scoped (no namespace).
+| Values key | Directory | Purpose |
+|------------|-----------|---------|
+| `podSecurity` | `pod-security/` | PSS baseline + restricted |
+| `bestPractices` | `best-practices/` | General best-practice policies |
+| `cleanupPolicies` | `cleanup-policies/` | Add your cleanup-related policies |
+| `platformEngineering` | `platform-engineering/` | Add platform / governance policies |
+
+Each set supports **`enabled`**, **`excluded`** (skip policy names), and **`overrides`** (deep-merge by `metadata.name`). All rendered resources are cluster-scoped.
+
+## Default behavior (v0.2.0+)
+
+**No policies are installed** until you set at least one `*.enabled: true`. This replaces the old top-level `policies:` key — use **`podSecurity`** instead.
+
+**Upgrade from chart &lt; 0.2.0:** replace `policies.excluded` / `policies.overrides` with `podSecurity.excluded` / `podSecurity.overrides`, and set `podSecurity.enabled: true` (and `bestPractices.enabled: true` if you relied on that set).
 
 ## Published chart (Nirmata)
 
-Repository: [github.com/nirmata/n4k-policies](https://github.com/nirmata/n4k-policies). Helm chart name (in `Chart.yaml`): **`n4k-policies`**. ValidatingPolicies use **`policies.kyverno.io/v1beta1`** (Kyverno 1.16.x).
+Repository: [github.com/nirmata/n4k-policies](https://github.com/nirmata/n4k-policies). Chart name: **`n4k-policies`**. ValidatingPolicies use **`policies.kyverno.io/v1beta1`** (Kyverno 1.16.x).
 
-### GitHub Pages Helm repository (recommended)
-
-After [one-time setup](#publishing-the-chart-github-pages), add the repo and install:
+### GitHub Pages
 
 ```bash
 helm repo add n4k-policies https://nirmata.github.io/n4k-policies/
 helm repo update
-helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace
+helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
+  --set podSecurity.enabled=true
 ```
 
-Install a specific chart version:
+Pin a chart version:
 
 ```bash
-helm install my-policies n4k-policies/n4k-policies -n kyverno --version 0.1.6
+helm install my-policies n4k-policies/n4k-policies -n kyverno --version 0.2.0 \
+  --set podSecurity.enabled=true --set bestPractices.enabled=true
 ```
 
-The first segment (`n4k-policies` in `n4k-policies/n4k-policies`) is the **repo alias** from `helm repo add`; the second is the **chart name** from this project’s `Chart.yaml`.
-
-### Other ways to install
-
-**OCI (GitHub Container Registry):**
+### OCI
 
 ```bash
-helm install my-policies oci://ghcr.io/nirmata/charts/n4k-policies --version 0.1.6 -n kyverno --create-namespace
+helm install my-policies oci://ghcr.io/nirmata/charts/n4k-policies --version 0.2.0 -n kyverno --create-namespace \
+  --set podSecurity.enabled=true
 ```
 
-**GitHub Release asset (direct `.tgz` URL):**
+### GitHub Release (`.tgz`)
 
 ```bash
-helm install my-policies https://github.com/nirmata/n4k-policies/releases/download/v0.1.6/n4k-policies-0.1.6.tgz -n kyverno --create-namespace
+helm install my-policies https://github.com/nirmata/n4k-policies/releases/download/v0.2.0/n4k-policies-0.2.0.tgz -n kyverno --create-namespace \
+  --set podSecurity.enabled=true
 ```
 
-## Deploy with Helm (from source)
+## Examples
+
+**Pod Security only:**
 
 ```bash
-# Install all policies (default: Audit mode)
-helm install my-policies . -n kyverno --create-namespace
-
-# Exclude specific policies
-helm install my-policies . -n kyverno --set 'policies.excluded[0]=disallow-host-ports' --set 'policies.excluded[1]=restrict-volume-types'
-
-# Override policies (e.g. switch to Enforce, add labels)
-helm install my-policies . -n kyverno -f my-values.yaml
-
-# Disable best-practices set
-helm install my-policies . -n kyverno --set 'bestPractices.enabled=false'
-
-# Exclude a best-practices policy
-helm install my-policies . -n kyverno --set 'bestPractices.excluded[0]=require-requests-limits'
+helm install pss n4k-policies/n4k-policies -n kyverno --create-namespace \
+  --set podSecurity.enabled=true --set bestPractices.enabled=false
 ```
 
-### Customize with values
+**Best practices only:**
 
-**PSS policies – exclude** – Do not deploy listed policies (use `metadata.name` of each policy):
+```bash
+helm install bp n4k-policies/n4k-policies -n kyverno --create-namespace \
+  --set podSecurity.enabled=false --set bestPractices.enabled=true
+```
+
+**Multiple sets (after you add YAML under those folders):**
+
+```bash
+helm install all n4k-policies/n4k-policies -n kyverno --create-namespace \
+  --set podSecurity.enabled=true \
+  --set bestPractices.enabled=true \
+  --set cleanupPolicies.enabled=true \
+  --set platformEngineering.enabled=true
+```
+
+**Reporting RBAC** (for policies that need aggregated reports-controller roles, e.g. `check-deprecated-apis`):
+
+```bash
+helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
+  --set bestPractices.enabled=true \
+  --set reportingRBAC.enabled=true
+```
+
+## Deploy from source
+
+```bash
+helm install my-policies . -n kyverno --create-namespace \
+  --set podSecurity.enabled=true
+
+# Exclude PSS policies by name
+helm install my-policies . -n kyverno --create-namespace \
+  --set podSecurity.enabled=true \
+  --set 'podSecurity.excluded[0]=disallow-host-ports'
+
+# Override a policy (e.g. Enforce)
+helm install my-policies . -n kyverno --create-namespace -f my-values.yaml
+```
+
+### `my-values.yaml` example
 
 ```yaml
-policies:
+podSecurity:
+  enabled: true
   excluded:
     - disallow-host-ports
-    - restrict-volume-types
-```
-
-**PSS policies – override** – Deep-merge overrides onto the base policy. Keys are policy `metadata.name`:
-
-```yaml
-policies:
   overrides:
     disallow-capabilities:
       spec:
         validationActions:
           - Enforce
-```
 
-**Best-practices** – Same capabilities: `bestPractices.enabled`, `bestPractices.excluded`, `bestPractices.overrides`:
-
-```yaml
 bestPractices:
   enabled: true
   excluded:
     - require-requests-limits
-  overrides:
-    disallow-latest-tag:
-      spec:
-        validationActions:
-          - Enforce
+
+reportingRBAC:
+  enabled: true
 ```
 
-## Policy list (by `metadata.name`)
+## Adding a new policy set
+
+1. Add a directory at the chart root, e.g. `my-set/*.yaml` (ValidatingPolicy manifests).
+2. Add a matching block in `values.yaml` and a line in `templates/policies.yaml`:
+
+   ```yaml
+   {{ include "n4k-policies.renderPolicySet" (dict "root" $root "set" .Values.mySet "glob" "my-set/*.yaml") }}
+   ```
+
+3. Document the set in this README.
+
+## Policy names (`metadata.name`)
 
 ### Pod Security (`pod-security/`)
 
@@ -122,23 +158,4 @@ check-deprecated-apis, disallow-container-sock-mounts, disallow-default-namespac
 
 ## Publishing the chart (GitHub Pages)
 
-Publishing is done by [`.github/workflows/publish-helm-pages.yml`](.github/workflows/publish-helm-pages.yml). On each push to `main` that changes the chart (or the workflow file), it:
-
-1. Runs `helm package` for the chart at the repo root.
-2. Pushes the `.tgz` files and a merged **`index.yaml`** to the **`gh-pages`** branch so Helm can use the site as a chart repository.
-
-**One-time setup (maintainers):**
-
-1. In the GitHub repo: **Settings → Pages → Build and deployment**.
-2. Under **Source**, choose **Deploy from a branch**, branch **`gh-pages`**, folder **`/ (root)`**, then Save.
-3. The repository URL for `helm repo add` is:
-
-   `https://nirmata.github.io/n4k-policies/`
-
-   (Pattern: `https://<org>.github.io/<repo>/`.)
-
-4. Merge the workflow to `main` (or run **Actions → Publish Helm chart to GitHub Pages → Run workflow**). After the first successful run, `https://nirmata.github.io/n4k-policies/index.yaml` should load in a browser.
-
-**Release a new chart version:** bump `version` in `Chart.yaml`, commit, and push to `main`. The workflow repackages and updates the Helm index on `gh-pages`.
-
-**Private repositories:** GitHub Pages for private repos requires a [paid GitHub plan](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages); otherwise use OCI or Release `.tgz` URLs for distribution.
+See [`.github/workflows/publish-helm-pages.yml`](.github/workflows/publish-helm-pages.yml). Enable **Pages** from the **`gh-pages`** branch in repo settings. Bump `version` in `Chart.yaml` and push to `main` to publish a new package.

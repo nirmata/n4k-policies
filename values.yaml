@@ -1,53 +1,32 @@
-# Default values for pss-kyverno-policies.
-# Deploys Kyverno ValidatingPolicies for Pod Security Standards (Baseline + Restricted).
+# n4k-policies — optional Kyverno ValidatingPolicy sets.
+# Nothing is installed unless a set has enabled: true (opt-in per set).
 
-# List of policy names to exclude from deployment (pod-security set).
-# Policy names match metadata.name in each policy (e.g. disallow-capabilities, restrict-sysctls).
-# Example: to skip disallow-host-ports and restrict-volume-types:
-#   excluded:
-#     - disallow-host-ports
-#     - restrict-volume-types
-policies:
+# Pod Security Standards (Baseline + Restricted) — policies in pod-security/*.yaml
+podSecurity:
+  enabled: false
   excluded: []
-
-  # Override specific fields on any policy. Keys are policy metadata.name.
-  # Values are merged (deep merge) on top of the base policy.
-  # Use this to change validationActions, add labels/annotations, or adjust spec.
-  #
-  # Example: change disallow-capabilities to Enforce and add a label:
-  #   overrides:
-  #     disallow-capabilities:
-  #       metadata:
-  #         labels:
-  #           custom: "true"
-  #       spec:
-  #         validationActions:
-  #           - Enforce
-  #
-  # Example: change multiple policies to Enforce:
-  #   overrides:
-  #     disallow-privileged-containers:
-  #       spec:
-  #         validationActions:
-  #           - Enforce
-  #     disallow-privilege-escalation:
-  #       spec:
-  #         validationActions:
-  #           - Enforce
   overrides: {}
 
-# Best-practices policy set (same exclude/override capabilities as policies above).
-# Policy names match metadata.name in each policy under best-practices/ (e.g. require-requests-limits,
-# disallow-latest-tag, restrict-image-registries, require-pod-probes).
+# Best practices — policies in best-practices/*.yaml
 bestPractices:
-  enabled: true
+  enabled: false
   excluded: []
   overrides: {}
 
-# Optional: deploy ClusterRoles that aggregate to Kyverno reports-controller for policy
-# reporting (restrict-image-registries, check-deprecated-apis). When enabled, a pre-upgrade
-# hook applies these before the rest of the release. Set to true only if you need reporting
-# for those policies and use Kyverno's ClusterRole aggregation (label
-# rbac.kyverno.io/aggregate-to-reports-controller).
+# Cleanup policies — add ValidatingPolicy YAML files under cleanup-policies/
+cleanupPolicies:
+  enabled: false
+  excluded: []
+  overrides: {}
+
+# Platform engineering policies — add ValidatingPolicy YAML files under platform-engineering/
+platformEngineering:
+  enabled: false
+  excluded: []
+  overrides: {}
+
+# ClusterRoles that aggregate to Kyverno reports-controller (label
+# rbac.kyverno.io/aggregate-to-reports-controller). Needed for reporting on some
+# best-practices policies (e.g. check-deprecated-apis). Enable when you use those policies.
 reportingRBAC:
-  enabled: true
+  enabled: false
