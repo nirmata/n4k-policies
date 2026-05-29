@@ -3,7 +3,22 @@ entries:
   n4k-policies:
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2026-03-20T03:03:04.187420084Z"
+    created: "2026-05-29T23:32:56.894554712Z"
+    description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security,
+      best practices, cleanup, platform, and custom directories)
+    digest: 981eb127abeea134792c3f6c00aced45b075645d218b9474fd74da3f592e8e6c
+    keywords:
+    - kyverno
+    - pod-security
+    - policy
+    name: n4k-policies
+    type: application
+    urls:
+    - https://nirmata.github.io/n4k-policies/n4k-policies-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-05-29T23:32:56.892638252Z"
     description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security,
       best practices, cleanup, platform, and custom directories)
     digest: 288a0deb253bc1aedf1553acaa0f27ce08189fdff9b6c5663eae07b67a97991a
@@ -18,7 +33,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2026-03-20T03:03:04.185739031Z"
+    created: "2026-05-29T23:32:56.89093255Z"
     description: Helm chart to deploy Kyverno Pod Security Standards (Baseline + Restricted)
       validating policies
     digest: aa39706b7dd908afb53531344e0706a3b5d709157a6d008a7ba84aa3cd37ed4d
@@ -31,4 +46,4 @@ entries:
     urls:
     - https://nirmata.github.io/n4k-policies/n4k-policies-0.1.6.tgz
     version: 0.1.6
-generated: "2026-03-20T03:03:04.183500447Z"
+generated: "2026-05-29T23:32:56.888593574Z"
