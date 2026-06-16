@@ -10,6 +10,7 @@ Helm chart that can deploy **one or more optional policy sets**. Each set is **o
 | `bestPractices` | `best-practices/` | General best-practice policies |
 | `cleanupPolicies` | `cleanup-policies/` | Add your cleanup-related policies |
 | `platformEngineering` | `platform-engineering/` | Add platform / governance policies |
+| `customPolicies` | `custom-policies/` | Drop in any ad-hoc policies without touching built-in sets |
 
 Each set supports **`enabled`**, **`excluded`** (skip policy names), and **`overrides`** (deep-merge by `metadata.name`). All rendered resources are cluster-scoped.
 
@@ -78,6 +79,39 @@ helm install all n4k-policies/n4k-policies -n kyverno --create-namespace \
   --set cleanupPolicies.enabled=true \
   --set platformEngineering.enabled=true
 ```
+
+**Custom policies only** (disable all built-in sets, deploy only your own):
+
+```bash
+helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
+  --set customPolicies.enabled=true
+```
+
+Or with a values file:
+
+```yaml
+# my-values.yaml
+podSecurity:
+  enabled: false
+bestPractices:
+  enabled: false
+cleanupPolicies:
+  enabled: false
+platformEngineering:
+  enabled: false
+
+customPolicies:
+  enabled: true
+  excluded:
+    - my-noisy-policy        # skip a specific policy by metadata.name
+  overrides:
+    my-policy-name:
+      spec:
+        validationActions:
+          - Enforce           # promote from Audit to Enforce without editing the file
+```
+
+Place your `ValidatingPolicy` (or `ClusterPolicy`) YAML files under `custom-policies/` before running `helm install/upgrade`. Any `*.yaml` file in that directory is picked up automatically.
 
 **Reporting RBAC** (for policies that need aggregated reports-controller roles, e.g. `check-deprecated-apis`):
 
