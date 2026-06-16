@@ -2,7 +2,7 @@ apiVersion: v2
 name: n4k-policies
 description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security, best practices, cleanup, platform, and custom directories)
 type: application
-version: 0.2.3
+version: 0.2.4
 appVersion: "1.0"
 keywords:
   - kyverno

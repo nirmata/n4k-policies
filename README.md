@@ -80,10 +80,20 @@ helm install all n4k-policies/n4k-policies -n kyverno --create-namespace \
   --set platformEngineering.enabled=true
 ```
 
-**Custom policies only** (disable all built-in sets, deploy only your own):
+**Custom policies only** (deploy only your own policies from local source):
+
+> **Note:** `customPolicies` requires a local-source deployment. Because Helm bundles chart files at package time, policies you place in `custom-policies/` are only visible when you run `helm install` directly from the cloned chart directory — not from the published Helm repo.
 
 ```bash
-helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
+# 1. Clone the chart
+git clone https://github.com/nirmata/n4k-policies.git
+cd n4k-policies
+
+# 2. Copy your ValidatingPolicy YAML files into custom-policies/
+cp /path/to/my-policy.yaml custom-policies/
+
+# 3. Install from local source
+helm install my-policies . -n kyverno --create-namespace \
   --set customPolicies.enabled=true
 ```
 
@@ -111,7 +121,11 @@ customPolicies:
           - Enforce           # promote from Audit to Enforce without editing the file
 ```
 
-Place your `ValidatingPolicy` (or `ClusterPolicy`) YAML files under `custom-policies/` before running `helm install/upgrade`. Any `*.yaml` file in that directory is picked up automatically.
+```bash
+helm install my-policies . -n kyverno --create-namespace -f my-values.yaml
+```
+
+Any `*.yaml` file placed under `custom-policies/` is picked up automatically. Do not commit customer-specific policies to this repo.
 
 **Reporting RBAC** (for policies that need aggregated reports-controller roles, e.g. `check-deprecated-apis`):
 

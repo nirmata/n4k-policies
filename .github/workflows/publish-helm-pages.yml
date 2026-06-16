@@ -16,7 +16,6 @@ on:
       - "best-practices/**"
       - "cleanup-policies/**"
       - "platform-engineering/**"
-      - "custom-policies/**"
       - ".github/workflows/publish-helm-pages.yml"
   workflow_dispatch:
 

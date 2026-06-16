@@ -28,7 +28,7 @@ platformEngineering:
 # Custom ad-hoc policies — copy any ValidatingPolicy YAML files under custom-policies/
 # and set enabled: true to deploy them. All other sets can remain disabled.
 customPolicies:
-  enabled: true
+  enabled: false
   excluded: []
   overrides: {}
 
