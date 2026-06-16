@@ -25,6 +25,13 @@ platformEngineering:
   excluded: []
   overrides: {}
 
+# Custom ad-hoc policies — copy any ValidatingPolicy YAML files under custom-policies/
+# and set enabled: true to deploy them. All other sets can remain disabled.
+customPolicies:
+  enabled: false
+  excluded: []
+  overrides: {}
+
 # ClusterRoles that aggregate to Kyverno reports-controller (label
 # rbac.kyverno.io/aggregate-to-reports-controller). Needed for reporting on some
 # best-practices policies (e.g. check-deprecated-apis). Enable when you use those policies.

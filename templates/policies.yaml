@@ -7,3 +7,4 @@
 {{ include "n4k-policies.renderPolicySet" (dict "root" $root "set" .Values.bestPractices "glob" "best-practices/*.yaml") }}
 {{ include "n4k-policies.renderPolicySet" (dict "root" $root "set" .Values.cleanupPolicies "glob" "cleanup-policies/*.yaml") }}
 {{ include "n4k-policies.renderPolicySet" (dict "root" $root "set" .Values.platformEngineering "glob" "platform-engineering/*.yaml") }}
+{{ include "n4k-policies.renderPolicySet" (dict "root" $root "set" .Values.customPolicies "glob" "custom-policies/*.yaml") }}
