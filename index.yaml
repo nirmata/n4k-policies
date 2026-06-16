@@ -3,7 +3,22 @@ entries:
   n4k-policies:
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2026-06-16T16:03:29.240883279Z"
+    created: "2026-06-16T16:15:16.497798113Z"
+    description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security,
+      best practices, cleanup, platform, and custom directories)
+    digest: a4855380fa2ff6b108956f920a224ea11deb843b77e8544fe491d784a06fc575
+    keywords:
+    - kyverno
+    - pod-security
+    - policy
+    name: n4k-policies
+    type: application
+    urls:
+    - https://nirmata.github.io/n4k-policies/n4k-policies-0.2.3.tgz
+    version: 0.2.3
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-06-16T16:15:16.49464Z"
     description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security,
       best practices, cleanup, platform, and custom directories)
     digest: b96ab9ccf25048a7e2d1d3fe7b6ef33b15b6f41e5ee1c4bfe3ab44877f48fc55
@@ -18,7 +33,7 @@ entries:
     version: 0.2.2
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2026-06-16T16:03:29.238262492Z"
+    created: "2026-06-16T16:15:16.4926405Z"
     description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security,
       best practices, cleanup, platform, and custom directories)
     digest: 981eb127abeea134792c3f6c00aced45b075645d218b9474fd74da3f592e8e6c
@@ -33,7 +48,7 @@ entries:
     version: 0.2.1
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2026-06-16T16:03:29.236226526Z"
+    created: "2026-06-16T16:15:16.491135104Z"
     description: Helm chart for optional Kyverno ValidatingPolicy sets (pod security,
       best practices, cleanup, platform, and custom directories)
     digest: 288a0deb253bc1aedf1553acaa0f27ce08189fdff9b6c5663eae07b67a97991a
@@ -48,7 +63,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2026-06-16T16:03:29.234204481Z"
+    created: "2026-06-16T16:15:16.489303618Z"
     description: Helm chart to deploy Kyverno Pod Security Standards (Baseline + Restricted)
       validating policies
     digest: aa39706b7dd908afb53531344e0706a3b5d709157a6d008a7ba84aa3cd37ed4d
@@ -61,4 +76,4 @@ entries:
     urls:
     - https://nirmata.github.io/n4k-policies/n4k-policies-0.1.6.tgz
     version: 0.1.6
-generated: "2026-06-16T16:03:29.231811098Z"
+generated: "2026-06-16T16:15:16.487416617Z"
