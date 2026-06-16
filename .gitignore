@@ -1,2 +1,5 @@
 *.tgz
 .DS_Store
+
+# Customer-specific policies — never commit to this public repo
+custom-policies/*.yaml
