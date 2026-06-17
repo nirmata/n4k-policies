@@ -84,32 +84,28 @@ helm install all n4k-policies/n4k-policies -n kyverno --create-namespace \
 
 > **Note:** `customPolicies` requires a local-source deployment. Because Helm bundles chart files at package time, policies you place in `custom-policies/` are only visible when you run `helm install` directly from the cloned chart directory — not from the published Helm repo.
 
+> **Webhook timeout:** Kyverno's policy validation webhook has a 10-second timeout. Installing all policies in one `helm install` creates them simultaneously and overwhelms the webhook. Use the provided `scripts/install.sh` for a fresh install — it deploys in four waves of ~10 policies each. Subsequent `helm upgrade` calls work fine without the script.
+
 ```bash
 # 1. Clone the chart
 git clone https://github.com/nirmata/n4k-policies.git
 cd n4k-policies
 
-# 2. Copy your ValidatingPolicy YAML files into custom-policies/
+# 2. Copy your ClusterPolicy YAML files into custom-policies/
 cp /path/to/my-policy.yaml custom-policies/
 
-# 3. Install from local source
-helm install my-policies . -n kyverno --create-namespace \
-  --set customPolicies.enabled=true
+# 3. Fresh install — use the batched install script
+./scripts/install.sh                              # defaults: release=my-policies, namespace=kyverno
+./scripts/install.sh my-policies kyverno .        # explicit args
+
+# 4. Subsequent upgrades (no batching needed)
+helm upgrade my-policies . -n kyverno --set customPolicies.enabled=true
 ```
 
 Or with a values file:
 
 ```yaml
 # my-values.yaml
-podSecurity:
-  enabled: false
-bestPractices:
-  enabled: false
-cleanupPolicies:
-  enabled: false
-platformEngineering:
-  enabled: false
-
 customPolicies:
   enabled: true
   excluded:
@@ -117,12 +113,14 @@ customPolicies:
   overrides:
     my-policy-name:
       spec:
-        validationActions:
-          - Enforce           # promote from Audit to Enforce without editing the file
+        validationFailureAction: Enforce  # promote from Audit to Enforce without editing the file
 ```
 
 ```bash
-helm install my-policies . -n kyverno --create-namespace -f my-values.yaml
+# Fresh install
+./scripts/install.sh my-policies kyverno .
+# then apply your values overrides via upgrade
+helm upgrade my-policies . -n kyverno -f my-values.yaml
 ```
 
 Any `*.yaml` file placed under `custom-policies/` is picked up automatically. Do not commit customer-specific policies to this repo.
@@ -137,17 +135,29 @@ helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace
 
 ## Deploy from source
 
+For a **fresh install of `customPolicies`** use the batched script (avoids Kyverno webhook timeouts):
+
+```bash
+./scripts/install.sh                        # release=my-policies, namespace=kyverno
+./scripts/install.sh <release> <namespace>  # custom args
+```
+
+For all **other sets** (podSecurity, bestPractices, etc.) or for **upgrades**, a plain Helm command works:
+
 ```bash
 helm install my-policies . -n kyverno --create-namespace \
   --set podSecurity.enabled=true
 
-# Exclude PSS policies by name
+# Exclude policies by name
 helm install my-policies . -n kyverno --create-namespace \
   --set podSecurity.enabled=true \
   --set 'podSecurity.excluded[0]=disallow-host-ports'
 
 # Override a policy (e.g. Enforce)
 helm install my-policies . -n kyverno --create-namespace -f my-values.yaml
+
+# Upgrade (works for all sets without batching)
+helm upgrade my-policies . -n kyverno --set customPolicies.enabled=true
 ```
 
 ### `my-values.yaml` example
@@ -199,6 +209,25 @@ reportingRBAC:
 | disallow-selinux | |
 | restrict-seccomp | |
 | restrict-sysctls | |
+
+### Custom policies (`custom-policies/`) — 38 policies
+
+| | | |
+|---|---|---|
+| add-networkpolicy | disallow-host-ports | require-run-as-nonroot |
+| add-safe-to-evict | disallow-host-ports-range | restrict-apparmor-profiles |
+| add-ttl-jobs | disallow-ingress-nginx-custom-snippets | restrict-controlplane-scheduling |
+| check-deprecated-apis | disallow-latest-tag | restrict-external-ips |
+| check-ephmeral-storage-capacity | disallow-privilege-escalation | restrict-image-registries |
+| check-evicted-pods | disallow-privileged-containers | restrict-nodeport |
+| disallow-capabilities | disallow-proc-mount | restrict-seccomp-strict |
+| disallow-capabilities-strict | disallow-selinux | restrict-sysctls |
+| disallow-container-sock-mounts | drop-all-capabilities | restrict-volume-types |
+| disallow-default-namespace | drop-cap-net-raw | require-ephemeral-storage-requests-limits |
+| disallow-empty-ingress-host | require-labels | require-namespace-quota |
+| disallow-helm-tiller | require-requests-limits | |
+| disallow-host-path | require-ro-rootfs | |
+| | require-run-as-non-root-user | |
 
 ### Best-practices (`best-practices/`)
 

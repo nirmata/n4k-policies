@@ -1,0 +1,36 @@
+# Batch 1 of 4 — installs the first 10 policies.
+# Policies in batches 2-4 are excluded so the webhook is not overwhelmed.
+customPolicies:
+  enabled: true
+  excluded:
+    # batch 2
+    - disallow-default-namespace
+    - disallow-empty-ingress-host
+    - disallow-helm-tiller
+    - disallow-host-path
+    - disallow-host-ports-range
+    - disallow-host-ports
+    - disallow-latest-tag
+    - disallow-privilege-escalation
+    - disallow-privileged-containers
+    - disallow-proc-mount
+    # batch 3
+    - disallow-selinux
+    - drop-all-capabilities
+    - drop-cap-net-raw
+    - require-ephemeral-storage-requests-limits
+    - require-labels
+    - require-namespace-quota
+    - require-requests-limits
+    - require-ro-rootfs
+    - require-run-as-non-root-user
+    - require-run-as-nonroot
+    # batch 4
+    - restrict-apparmor-profiles
+    - restrict-controlplane-scheduling
+    - restrict-image-registries
+    - restrict-nodeport
+    - restrict-seccomp-strict
+    - restrict-external-ips
+    - restrict-sysctls
+    - restrict-volume-types

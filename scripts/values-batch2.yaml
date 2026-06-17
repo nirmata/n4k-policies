@@ -1,0 +1,25 @@
+# Batch 2 of 4 — adds policies 11-20 to the existing 10.
+# Only batches 3-4 remain excluded.
+customPolicies:
+  enabled: true
+  excluded:
+    # batch 3
+    - disallow-selinux
+    - drop-all-capabilities
+    - drop-cap-net-raw
+    - require-ephemeral-storage-requests-limits
+    - require-labels
+    - require-namespace-quota
+    - require-requests-limits
+    - require-ro-rootfs
+    - require-run-as-non-root-user
+    - require-run-as-nonroot
+    # batch 4
+    - restrict-apparmor-profiles
+    - restrict-controlplane-scheduling
+    - restrict-image-registries
+    - restrict-nodeport
+    - restrict-seccomp-strict
+    - restrict-external-ips
+    - restrict-sysctls
+    - restrict-volume-types

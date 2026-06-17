@@ -1,0 +1,14 @@
+# Batch 3 of 4 — adds policies 21-30 to the existing 20.
+# Only batch 4 remains excluded.
+customPolicies:
+  enabled: true
+  excluded:
+    # batch 4
+    - restrict-apparmor-profiles
+    - restrict-controlplane-scheduling
+    - restrict-image-registries
+    - restrict-nodeport
+    - restrict-seccomp-strict
+    - restrict-external-ips
+    - restrict-sysctls
+    - restrict-volume-types
