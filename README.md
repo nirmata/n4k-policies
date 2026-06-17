@@ -29,28 +29,28 @@ Repository: [github.com/nirmata/n4k-policies](https://github.com/nirmata/n4k-pol
 ```bash
 helm repo add n4k-policies https://nirmata.github.io/n4k-policies/
 helm repo update
-helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
+helm install n4k-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
   --set podSecurity.enabled=true
 ```
 
 Pin a chart version:
 
 ```bash
-helm install my-policies n4k-policies/n4k-policies -n kyverno --version 0.2.0 \
+helm install n4k-policies n4k-policies/n4k-policies -n kyverno --version 0.2.0 \
   --set podSecurity.enabled=true --set bestPractices.enabled=true
 ```
 
 ### OCI
 
 ```bash
-helm install my-policies oci://ghcr.io/nirmata/charts/n4k-policies --version 0.2.0 -n kyverno --create-namespace \
+helm install n4k-policies oci://ghcr.io/nirmata/charts/n4k-policies --version 0.2.0 -n kyverno --create-namespace \
   --set podSecurity.enabled=true
 ```
 
 ### GitHub Release (`.tgz`)
 
 ```bash
-helm install my-policies https://github.com/nirmata/n4k-policies/releases/download/v0.2.0/n4k-policies-0.2.0.tgz -n kyverno --create-namespace \
+helm install n4k-policies https://github.com/nirmata/n4k-policies/releases/download/v0.2.0/n4k-policies-0.2.0.tgz -n kyverno --create-namespace \
   --set podSecurity.enabled=true
 ```
 
@@ -95,11 +95,11 @@ cd n4k-policies
 cp /path/to/my-policy.yaml custom-policies/
 
 # 3. Fresh install — use the batched install script
-./custom-policies/scripts/install.sh                              # defaults: release=my-policies, namespace=kyverno
-./custom-policies/scripts/install.sh my-policies kyverno .        # explicit args
+./custom-policies/scripts/install.sh                              # defaults: release=n4k-policies, namespace=kyverno
+./custom-policies/scripts/install.sh n4k-policies kyverno .        # explicit args
 
 # 4. Subsequent upgrades (no batching needed)
-helm upgrade my-policies . -n kyverno --set customPolicies.enabled=true
+helm upgrade n4k-policies . -n kyverno --set customPolicies.enabled=true
 ```
 
 Or with a values file:
@@ -118,9 +118,9 @@ customPolicies:
 
 ```bash
 # Fresh install
-./custom-policies/scripts/install.sh my-policies kyverno .
+./custom-policies/scripts/install.sh n4k-policies kyverno .
 # then apply your values overrides via upgrade
-helm upgrade my-policies . -n kyverno -f my-values.yaml
+helm upgrade n4k-policies . -n kyverno -f my-values.yaml
 ```
 
 Any `*.yaml` file placed under `custom-policies/` is picked up automatically. Do not commit customer-specific policies to this repo.
@@ -128,7 +128,7 @@ Any `*.yaml` file placed under `custom-policies/` is picked up automatically. Do
 **Reporting RBAC** (for policies that need aggregated reports-controller roles, e.g. `check-deprecated-apis`):
 
 ```bash
-helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
+helm install n4k-policies n4k-policies/n4k-policies -n kyverno --create-namespace \
   --set bestPractices.enabled=true \
   --set reportingRBAC.enabled=true
 ```
@@ -138,26 +138,26 @@ helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace
 For a **fresh install of `customPolicies`** use the batched script (avoids Kyverno webhook timeouts):
 
 ```bash
-./custom-policies/scripts/install.sh                        # release=my-policies, namespace=kyverno
+./custom-policies/scripts/install.sh                        # release=n4k-policies, namespace=kyverno
 ./custom-policies/scripts/install.sh <release> <namespace>  # custom args
 ```
 
 For all **other sets** (podSecurity, bestPractices, etc.) or for **upgrades**, a plain Helm command works:
 
 ```bash
-helm install my-policies . -n kyverno --create-namespace \
+helm install n4k-policies . -n kyverno --create-namespace \
   --set podSecurity.enabled=true
 
 # Exclude policies by name
-helm install my-policies . -n kyverno --create-namespace \
+helm install n4k-policies . -n kyverno --create-namespace \
   --set podSecurity.enabled=true \
   --set 'podSecurity.excluded[0]=disallow-host-ports'
 
 # Override a policy (e.g. Enforce)
-helm install my-policies . -n kyverno --create-namespace -f my-values.yaml
+helm install n4k-policies . -n kyverno --create-namespace -f my-values.yaml
 
 # Upgrade (works for all sets without batching)
-helm upgrade my-policies . -n kyverno --set customPolicies.enabled=true
+helm upgrade n4k-policies . -n kyverno --set customPolicies.enabled=true
 ```
 
 ### `my-values.yaml` example

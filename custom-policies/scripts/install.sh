@@ -7,12 +7,12 @@
 #   ./scripts/install.sh [release-name] [namespace] [chart-path]
 #
 # Defaults:
-#   release-name : my-policies
+#   release-name : n4k-policies
 #   namespace    : kyverno
 #   chart-path   : . (current directory, i.e. the chart root)
 set -euo pipefail
 
-RELEASE="${1:-my-policies}"
+RELEASE="${1:-n4k-policies}"
 NAMESPACE="${2:-kyverno}"
 CHART="${3:-.}"
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
