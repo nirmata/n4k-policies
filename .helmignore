@@ -1,0 +1,8 @@
+.git/
+.github/
+.gitignore
+AGENTS.md
+README.md
+*/README.md
+platform-engineering/README.md
+cleanup-policies/README.md
