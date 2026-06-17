@@ -12,8 +12,7 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 helm_args=(--namespace "$NAMESPACE" --create-namespace)
 
 run() {
-  local out
-  out=$(helm "$@" 2>&1) || { printf 'helm failed:\n%s\n' "$out" >&2; exit 1; }
+  helm "$@" > /dev/null || exit 1
 }
 
 echo "Release: $RELEASE | Namespace: $NAMESPACE"
