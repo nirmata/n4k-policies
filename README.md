@@ -84,7 +84,7 @@ helm install all n4k-policies/n4k-policies -n kyverno --create-namespace \
 
 > **Note:** `customPolicies` requires a local-source deployment. Because Helm bundles chart files at package time, policies you place in `custom-policies/` are only visible when you run `helm install` directly from the cloned chart directory — not from the published Helm repo.
 
-> **Webhook timeout:** Kyverno's policy validation webhook has a 10-second timeout. Installing all policies in one `helm install` creates them simultaneously and overwhelms the webhook. Use the provided `custom-policies/scripts/install.sh` for a fresh install — it deploys in four waves of ~10 policies each. Subsequent `helm upgrade` calls work fine without the script.
+> **Webhook timeout:** Kyverno's policy validation webhook has a 10-second timeout. Installing all policies in one `helm install` creates them simultaneously and overwhelms the webhook. Use the provided `custom-policies/scripts/install.sh` for a fresh install — it deploys in four waves of ~10 policies each, printing the newly deployed policies after each wave. Subsequent `helm upgrade` calls work fine without the script.
 
 ```bash
 # 1. Clone the chart
