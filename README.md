@@ -84,7 +84,7 @@ helm install all n4k-policies/n4k-policies -n kyverno --create-namespace \
 
 > **Note:** `customPolicies` requires a local-source deployment. Because Helm bundles chart files at package time, policies you place in `custom-policies/` are only visible when you run `helm install` directly from the cloned chart directory — not from the published Helm repo.
 
-> **Webhook timeout:** Kyverno's policy validation webhook has a 10-second timeout. Installing all policies in one `helm install` creates them simultaneously and overwhelms the webhook. Use the provided `scripts/install.sh` for a fresh install — it deploys in four waves of ~10 policies each. Subsequent `helm upgrade` calls work fine without the script.
+> **Webhook timeout:** Kyverno's policy validation webhook has a 10-second timeout. Installing all policies in one `helm install` creates them simultaneously and overwhelms the webhook. Use the provided `custom-policies/scripts/install.sh` for a fresh install — it deploys in four waves of ~10 policies each. Subsequent `helm upgrade` calls work fine without the script.
 
 ```bash
 # 1. Clone the chart
@@ -95,8 +95,8 @@ cd n4k-policies
 cp /path/to/my-policy.yaml custom-policies/
 
 # 3. Fresh install — use the batched install script
-./scripts/install.sh                              # defaults: release=my-policies, namespace=kyverno
-./scripts/install.sh my-policies kyverno .        # explicit args
+./custom-policies/scripts/install.sh                              # defaults: release=my-policies, namespace=kyverno
+./custom-policies/scripts/install.sh my-policies kyverno .        # explicit args
 
 # 4. Subsequent upgrades (no batching needed)
 helm upgrade my-policies . -n kyverno --set customPolicies.enabled=true
@@ -118,7 +118,7 @@ customPolicies:
 
 ```bash
 # Fresh install
-./scripts/install.sh my-policies kyverno .
+./custom-policies/scripts/install.sh my-policies kyverno .
 # then apply your values overrides via upgrade
 helm upgrade my-policies . -n kyverno -f my-values.yaml
 ```
@@ -138,8 +138,8 @@ helm install my-policies n4k-policies/n4k-policies -n kyverno --create-namespace
 For a **fresh install of `customPolicies`** use the batched script (avoids Kyverno webhook timeouts):
 
 ```bash
-./scripts/install.sh                        # release=my-policies, namespace=kyverno
-./scripts/install.sh <release> <namespace>  # custom args
+./custom-policies/scripts/install.sh                        # release=my-policies, namespace=kyverno
+./custom-policies/scripts/install.sh <release> <namespace>  # custom args
 ```
 
 For all **other sets** (podSecurity, bestPractices, etc.) or for **upgrades**, a plain Helm command works:
